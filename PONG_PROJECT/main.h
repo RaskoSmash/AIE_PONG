@@ -16,7 +16,6 @@ struct Player
 	float speed;
 	int score;
 	bool playerTwo;
-	bool Scored;
 };
 
 //organize and create separate balls with the same variable typing

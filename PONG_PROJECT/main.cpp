@@ -29,7 +29,7 @@ void Difficulty(); //BLANK
 
 float BallVelocity(Ball); //BLANK
 
-void Collision(Player player, Ball &ball); //DONE
+void Collision(Player &player, Ball &ball); //DONE
 
 
 
@@ -38,8 +38,6 @@ int main()
 {
 	MainMenu();
 	Game();
-
-	system("pause");
 }
 
 
@@ -54,12 +52,10 @@ Player PlayerInput(Player player)
 	if (sfw::getKey(player.up)) 
 	{ 
 		player.acceleration = -player.speed; 
-		cout << player.position.y << endl;
 	}
 	if (sfw::getKey(player.down)) 
 	{ 
 		player.acceleration = player.speed;
-		cout << player.position.y << endl;
 	}
 
 	player.velocity = player.acceleration;
@@ -98,7 +94,7 @@ Player EnemyAI(Player enemy, Ball ball)
 		enemy.position.y += enemy.velocity * sfw::getDeltaTime();
 		return enemy;
 	}
-
+	return enemy;
 } 
 
 void MainMenu()
@@ -129,7 +125,6 @@ void Game()
 	player1.up = 'W';
 	player1.down = 'S';
 	player1.playerTwo = false;
-	player1.Scored = false;
 
 	Ball ball = {};
 	ball.position.x = 400;
@@ -144,7 +139,8 @@ void Game()
 	player2.up = 'I';
 	player2.down = 'K';
 	player2.playerTwo = true;
-	player2.Scored = false;
+
+	int displayScore[2];
 
 	/*Player enemy = {};
 	enemy.position.x = 770;
@@ -172,17 +168,43 @@ void Game()
 
 		DrawBall(ball.position.x, ball.position.y, BALL_RADIUS);
 
+		if (ball.position.x <= -10)
+		{
+			ball.position.x = WINDOW_WIDTH / 2; ball.position.y = WINDOW_HEIGHT / 2;
+			player2.score++;
+			displayScore[1] = player2.score;
+			cout << "Player 2 score: " << displayScore[1] << endl;
+		}
+		else if (ball.position.x >= WINDOW_WIDTH + 10)
+		{
+			ball.position.x = WINDOW_WIDTH / 2; ball.position.y = WINDOW_HEIGHT / 2;
+			player1.score++;
+			displayScore[0] = player1.score;
+			cout << "Player 1 score: " << displayScore[0] << endl;
+		}
+
 		Collision(player1, ball);
 		Collision(player2, ball);
 
-		//if()
+		if (player2.score == 5)
+		{
+			cout << "Player 2 wins!" << endl;
+			system("pause");
+			break;
+		}
+		else if (player1.score == 5)
+		{
+			cout << "Player 1 wins!" << endl;
+			system("pause");
+			break;
+		}
 
 	}
 
 	sfw::termContext();
 }
 
-void Collision(Player player, Ball &ball)
+void Collision(Player &player, Ball &ball)
 {
 	//Changed my velocity float to two separate floats and tung helped with advice
 	if (ball.position.y >= WINDOW_HEIGHT || ball.position.y <= 0)
@@ -190,10 +212,6 @@ void Collision(Player player, Ball &ball)
 		ball.yvel = -ball.yvel;
 	}
 
-	if (ball.position.x <= -10 || ball.position.x >= WINDOW_WIDTH + 10)
-	{
-		ball.position.x = WINDOW_WIDTH / 2; ball.position.y = WINDOW_HEIGHT / 2;
-	}
 	ball.position.x += ball.xvel * sfw::getDeltaTime();
 	ball.position.y += ball.yvel * sfw::getDeltaTime();
 
@@ -213,7 +231,16 @@ void Collision(Player player, Ball &ball)
 			ball.xvel = -ball.xvel;
 		}
 	}
-	/*This Code was in game loop to check 
+
+	if (player.position.y <= 0)
+	{
+		player.position.y = 1;
+	}
+	else if (player.position.y >= WINDOW_HEIGHT - PADDLE_HEIGHT)
+	{
+		player.position.y = (WINDOW_HEIGHT - PADDLE_HEIGHT) - 1;
+	}
+	/*This Code was for AI
 	if (ball.position.x - BALL_RADIUS <= enemy.position.x + PADDLE_WIDTH / 2 && ball.position.x + BALL_RADIUS >= enemy.position.x - PADDLE_WIDTH / 2
 		&& ball.position.y >= enemy.position.y - PADDLE_HEIGHT / 2 && ball.position.y <= enemy.position.y + PADDLE_HEIGHT / 2)
 	{
